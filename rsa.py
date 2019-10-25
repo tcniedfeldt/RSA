@@ -28,17 +28,28 @@ def gcd(a, b) -> int:
 # multiplicative inverse using extended euclid's: 
 # 1 = (d * e) + (k * n)
 # where 1 = d * e (mod n)
-def modMultInv(a, b) -> int:
-    s = 0
-    old_s = 1
-    r = b
-    old_r = a
+def modMultInv(a, n) -> int:
+    t = 0
+    new_t = 1
+    r = n
+    new_r = a
 
-    while r != 0:
-        quotient = old_r / r
-        temp = r
-        r = old_r - quotient * temp
-        old_r = temp
+    while new_r != 0:
+        quotient = r // new_r
+        
+        temp = new_t
+        new_t = t - quotient * new_t
+        t = temp
+
+        temp = new_r
+        new_r = r - quotient * new_r
+        r = temp
+
+    if r > 1:
+        return -1
+    if t < 0:
+        t += n
+    return t
 
 # g^a (mod p) --- modular exponentiation
 def modexp(g, a, p) -> int:
@@ -115,10 +126,13 @@ while not isHighBitSet(p, num_bits) or not isHighBitSet(q, num_bits) or gcd(e, p
     while not isHighBitSet(q, num_bits): # try until high-bit is set
         q = number.getPrime(num_bits)
 
+# p = 8443387835004101215851905054157724839443611784354943714867080447137227467125482283225661870188902481927291031623803848076838202005588776194736300663373289
+# q = 12935144558132066666843525205115027645252508541376505355633204595670013888637205815127469543002003431382545047032763316310455959324586373400414535853870683
+
 # calculate
 n = p*q
 phi = phi(p,q)
-# d = modMultInv(e, phi)
+d = modMultInv(e, phi)
 
 # print out all the numbers
 print("p:", p)
@@ -126,6 +140,15 @@ print("q:", q)
 print("n:", n)
 print("phi:", phi)
 print("e:", e)
-# print("d:", d)
+print("d:", d)
+print("e * d (mod phi):", (e * d) % phi)
 
-# 
+# # encrypt - based on hard-coded p and q
+# plaintext = 6759569506963574401869537758242835501766815189981273397955337795936567019014429127803797090682423142647973832860178613125969856093009480540013884861624
+# plaintext_enc = modexp(plaintext, e, n)
+# print("encrypted plaintext:", plaintext_enc)
+
+# # decrypt - based on hard-coded p and q
+# encryption = 87025328326623360381041427425456285738931607587831313249216326937149885497044701313846481619839243754389672471991414203455090267587922699687554543601897300689302144088372379355090453288183676918624767430833597665322749956654985310614944521053334038276506877719174634580476151457865672542858599814076665862301
+# encryption_dec = modexp(encryption, d, n)
+# print("decrypted encryption:", encryption_dec)
